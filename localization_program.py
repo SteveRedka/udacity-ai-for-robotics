@@ -50,7 +50,8 @@ def localize(colors, measurements, motions, sensor_right, p_move):
     pinit = 1.0 / float(len(colors)) / float(len(colors[0]))
     p = [[pinit for row in range(len(colors[0]))]
                                  for col in range(len(colors))]
-    # >>> Insert your code here <<<
+    if len(measurements) != len(motions):
+        raise ValueError, 'measurements and motions have different length!'
 
     for i in range(len(motions)):
         p = move(p, motions[i], p_move)
@@ -73,6 +74,7 @@ def sense(p, color, sensor_right):
     sensor_wrong = 1.0 - sensor_right
     world_width = len(p)
     world_height = len(p[0])
+    normalization = 0.0
     result = [[0 for row in range(world_height)] for col in range(world_width)]
     for x in range(world_width):
         for y in range(world_height):
@@ -80,10 +82,10 @@ def sense(p, color, sensor_right):
                 result[x][y] = sensor_right * p[x][y]
             else:
                 result[x][y] = sensor_wrong * p[x][y]
-    normalization = sum(map(sum, result))
+            normalization += result[x][y]
     for x in range(world_width):
         for y in range(world_height):
-            result[x][y] = result[x][y]/normalization
+            result[x][y] /= normalization
     return result
 
 def show(p):
